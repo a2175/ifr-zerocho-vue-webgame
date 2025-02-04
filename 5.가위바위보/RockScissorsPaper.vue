@@ -18,6 +18,7 @@
     보: '-284px',
   };
 
+  let interval = null;
   export default {
     data() {
       return {
@@ -37,6 +38,40 @@
       onClickButton(choice) {
 
       },
+    },
+    beforeCreate() {
+      console.log('beforeCreate');
+    },
+    created() {
+      console.log('created');
+    },
+    beforeMount() {
+      console.log('beforeMount');
+    },
+    mounted() {
+      console.log('mounted');
+      interval = setInterval(() => {
+        if (this.imgCoord === rspCoords.바위) {
+          this.imgCoord = rspCoords.가위;
+        } else if (this.imgCoord === rspCoords.가위) {
+          this.imgCoord = rspCoords.보;
+        } else if (this.imgCoord === rspCoords.보) {
+          this.imgCoord = rspCoords.바위;
+        }
+      }, 100);
+    },
+    beforeUpdate() {
+      console.log('beforeUpdate');
+    },
+    updated() {
+      console.log('updated');
+    },
+    beforeDestroy() {
+      console.log('beforeDestroy');
+      clearInterval(interval);
+    },
+    destroyed() {
+      console.log('destroyed');
     },
   };
 </script>
