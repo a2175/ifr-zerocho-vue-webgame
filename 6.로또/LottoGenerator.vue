@@ -2,11 +2,11 @@
   <div>
     <div>당첨 숫자</div>
     <div id="결과창">
-      <lotto-ball v-for="ball in winBalls" number="5"></lotto-ball>
+      <lotto-ball v-for="ball in winBalls" :key="ball" :number="ball"></lotto-ball>
     </div>
     <div>보너스</div>
-    <lotto-ball v-if="bonus"></lotto-ball>
-    <button v-if="redo">한 번 더!</button>
+    <lotto-ball v-if="bonus" :number="bonus"></lotto-ball>
+    <button v-if="redo" @click="onClickRedo">한 번 더!</button>
   </div>
 </template>
 
@@ -24,6 +24,7 @@
     return [...winNumbers, bonusNumber];
   }
 
+  const timeouts = [];
   export default {
     components: {
       LottoBall,
@@ -40,13 +41,32 @@
 
     },
     methods: {
-
+      onClickRedo() {
+        this.winNumbers = getWinNumbers();
+        this.winBalls = [];
+        this.bonus = null;
+        this.redo = false;
+        this.showBalls();
+      },
+      showBalls() {
+        for (let i = 0; i < this.winNumbers.length - 1; i++) {
+          timeouts[i] = setTimeout(() => {
+            this.winBalls.push(this.winNumbers[i]);
+          }, (i + 1) * 1000);
+        }
+        timeouts[6] = setTimeout(() => {
+          this.bonus = this.winNumbers[6];
+          this.redo = true;
+        }, 7000);
+      },
     },
     mounted() {
-
+      this.showBalls();
     },
     beforeDestroy() {
-
+      timeouts.forEach((t) => {
+        clearTimeout(t);
+      });
     },
     watch: {
 
