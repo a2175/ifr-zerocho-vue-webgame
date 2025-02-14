@@ -46,7 +46,6 @@
         this.winBalls = [];
         this.bonus = null;
         this.redo = false;
-        this.showBalls();
       },
       showBalls() {
         for (let i = 0; i < this.winNumbers.length - 1; i++) {
@@ -69,7 +68,11 @@
       });
     },
     watch: {
-
+      winBalls(value, oldValue) {
+        if (value.length === 0) {
+          this.showBalls();
+        }
+      }
     },
   };
 </script>
