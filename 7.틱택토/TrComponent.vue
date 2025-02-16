@@ -11,6 +11,11 @@
     components: {
       TdComponent,
     },
+    data() {
+      return {
+        parent: '내가 니 애비다',
+      };
+    },
     props: {
       rowData: Array,
       rowIndex: Number,
