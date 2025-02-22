@@ -7,9 +7,19 @@
 
   export default {
     props: {
-      cellData: String,
       rowIndex: Number,
       cellIndex: Number,
+    },
+    computed: {
+      cellData() {
+        return this.$store.state.tableData[this.rowIndex][this.cellIndex];
+      },
+      tableData() {
+        return this.$store.state.tableData;
+      },
+      turn() {
+        return this.$store.state.turn;
+      },
     },
     methods: {
       onClickTd() {

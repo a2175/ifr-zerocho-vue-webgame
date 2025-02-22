@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
+Vue.use(Vuex);
+
 export const SET_WINNER = 'SET_WINNER'; // 사용예시: import { SET_WINNER, CLICK_CELL, CHANGE_TURN } from './store';
 export const CLICK_CELL = 'CLICK_CELL';
 export const CHANGE_TURN = 'CHANGE_TURN';
