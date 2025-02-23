@@ -1,12 +1,13 @@
 <template>
   <div>
-    <div>{{turn}}님의 턴입니다.</div>
+    <div>{{turnMessage}}</div>
     <table-component />
     <div v-if="winner">{{winner}}님의 승리!</div>
   </div>
 </template>
 
 <script>
+  import { mapState, mapGetters } from 'vuex';
   import store from './store';
   import TableComponent from './TableComponent';
 
@@ -15,16 +16,9 @@
     components: {
       TableComponent
     },
-    data() {
-      return {
-        tableData: [
-          ['', '', ''],
-          ['', '', ''],
-          ['', '', ''],
-        ],
-        turn: 'O',
-        winner: '',
-      };
+    computed: {
+      ...mapState(['winner']),
+      ...mapGetters(['turnMessage']),
     },
   };
 </script>
