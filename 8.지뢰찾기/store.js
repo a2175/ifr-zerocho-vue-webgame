@@ -78,9 +78,33 @@ export default new Vuex.Store({
       state.halted = false;
     },
     [OPEN_CELL](state, { row, cell }) {
-      Vue.set(state.tableData[row], cell, CODE.OPENED);
+      function checkAround(row, cell) { // 주변 8칸 지뢰인지 검색
+        let around = [];
+        if (state.tableData[row - 1]) {
+          around = around.concat([
+            state.tableData[row - 1][cell - 1], state.tableData[row - 1][cell], state.tableData[row - 1][cell + 1]
+          ]);
+        }
+        around = around.concat([
+          state.tableData[row][cell - 1], state.tableData[row][cell + 1]
+        ]);
+        if (state.tableData[row + 1]) {
+          around = around.concat([
+            state.tableData[row + 1][cell - 1], state.tableData[row + 1][cell], state.tableData[row + 1][cell + 1]
+          ]);
+        }
+        const counted = around.filter(function(v) {
+          return [CODE.MINE, CODE.FLAG_MINE, CODE.QUESTION_MINE].includes(v);
+        });
+        return counted.length;
+      }
+      const count = checkAround(row, cell);
+      Vue.set(state.tableData[row], cell, count);
     },
-    [CLICK_MINE](state) {},
+    [CLICK_MINE](state, { row, cell }) {
+      state.halted = true;
+      Vue.set(state.tableData[row], cell, CODE.CLICKED_MINE);
+    },
     [FLAG_CELL](state, { row, cell }) {
       if (state.tableData[row][cell] === CODE.MINE) {
         Vue.set(state.tableData[row], cell, CODE.FLAG_MINE);
