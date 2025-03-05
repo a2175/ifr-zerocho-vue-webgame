@@ -78,16 +78,13 @@ export default new Vuex.Store({
       state.timer = 0;
       state.openedCount = 0;
       state.halted = false;
+      state.result = ''
     },
     [OPEN_CELL](state, { row, cell }) {
       let openedCount = 0;
       const checked = [];
       function checkAround(row, cell) { // 주변 8칸 지뢰인지 검색
-        const checkRowOrCellIsUndefined = row < 0 || row >= state.tableData.length || cell < 0 || cell >= state.tableData[0].length;
-        if (checkRowOrCellIsUndefined) {
-          return;
-        }
-        if ([CODE.OPENED, CODE.FLAG, CODE.FLAG_MINE, CODE.QUESTION_MINE, CODE.QUESTION].includes(state.tableData[row][cell])) {
+        if (state.tableData[row][cell] >= CODE.OPENED) {
           return;
         }
         if (checked.includes(row + '/' + cell)) {
@@ -97,57 +94,52 @@ export default new Vuex.Store({
         }
 
         let around = [];
-        if (state.tableData[row - 1]) {
-          around = around.concat([
-            state.tableData[row - 1][cell - 1], state.tableData[row - 1][cell], state.tableData[row - 1][cell + 1]
-          ]);
-        }
-        around = around.concat([
-          state.tableData[row][cell - 1], state.tableData[row][cell + 1]
-        ]);
-        if (state.tableData[row + 1]) {
-          around = around.concat([
-            state.tableData[row + 1][cell - 1], state.tableData[row + 1][cell], state.tableData[row + 1][cell + 1]
-          ]);
-        }
+
+        // 윗 3칸
+        around.push([row - 1, cell - 1]);
+        around.push([row - 1, cell]);
+        around.push([row - 1, cell + 1]);
+
+        // 좌우 2칸
+        around.push([row, cell - 1]);
+        around.push([row, cell + 1]);
+
+        // 아래 3칸
+        around.push([row + 1, cell - 1]);
+        around.push([row + 1, cell]);
+        around.push([row + 1, cell + 1]);
+
+        const checkRowOrCellIsUndefined = (row, cell) => {
+          return row < 0 || row >= state.tableData.length || cell < 0 || cell >= state.tableData[0].length;
+        };
+
         const counted = around.filter(function(v) {
-          return [CODE.MINE, CODE.FLAG_MINE, CODE.QUESTION_MINE].includes(v);
+          if (!checkRowOrCellIsUndefined(v[0], v[1])) {
+            return [CODE.MINE, CODE.FLAG_MINE, CODE.QUESTION_MINE].includes(state.tableData[v[0]][v[1]]);
+          }
         });
-        if (counted.length === 0 && row > -1) { // 주변칸에 지뢰가 하나도 없으면
-          const near = [];
-          if (row - 1 > -1) {
-            near.push([row - 1, cell - 1]);
-            near.push([row - 1, cell]);
-            near.push([row - 1, cell + 1]);
-          }
-          near.push([row, cell - 1]);
-          near.push([row, cell + 1]);
-          if (row + 1 < state.tableData.length) {
-            near.push([row + 1, cell - 1]);
-            near.push([row + 1, cell]);
-            near.push([row + 1, cell + 1]);
-          }
-          near.forEach((n) => {
-            if (state.tableData[n[0]][n[1]] !== CODE.OPENED) {
-              checkAround(n[0], n[1]);
+        if (counted.length === 0) { // 주변칸에 지뢰가 하나도 없으면
+          // 재귀 호출을 사용해 주변칸도 검색
+          around.forEach((v) => {
+            if (!checkRowOrCellIsUndefined(v[0], v[1])) {
+              checkAround(v[0], v[1]);
             }
           });
         }
-        if (state.tableData[row][cell] === CODE.NORMAL) {
+        if ([CODE.NORMAL, CODE.FLAG, CODE.QUESTION].includes(state.tableData[row][cell])) {
           openedCount += 1;
         }
         Vue.set(state.tableData[row], cell, counted.length);
       }
       checkAround(row, cell);
-      let halted = false;
-      let result = '';
-      if (state.data.row * state.data.cell - state.data.mine === state.openedCount + openedCount) {
-        halted = true;
-        result = `${state.timer}초만에 승리하셨습니다.`;
-      }
+      
       state.openedCount += openedCount;
-      state.halted = halted;
-      state.result = result;
+
+      // 승리 조건 체크
+      if (state.data.row * state.data.cell - state.data.mine === state.openedCount) {
+        state.halted = true;
+        state.result = `${state.timer}초만에 승리하셨습니다.`;
+      }
     },
     [CLICK_MINE](state, { row, cell }) {
       state.halted = true;
