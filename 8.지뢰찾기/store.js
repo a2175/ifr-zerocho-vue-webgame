@@ -61,6 +61,7 @@ export default new Vuex.Store({
     },
     timer: 0,
     halted: true, // 중단된
+    openedCount: 0,
     result: '',
   }, // vue의 data와 비슷
   getters: {
@@ -75,9 +76,11 @@ export default new Vuex.Store({
       };
       state.tableData = plantMine(row, cell, mine);
       state.timer = 0;
+      state.openedCount = 0;
       state.halted = false;
     },
     [OPEN_CELL](state, { row, cell }) {
+      let openedCount = 0;
       const checked = [];
       function checkAround(row, cell) { // 주변 8칸 지뢰인지 검색
         const checkRowOrCellIsUndefined = row < 0 || row >= state.tableData.length || cell < 0 || cell >= state.tableData[0].length;
@@ -130,10 +133,21 @@ export default new Vuex.Store({
             }
           });
         }
-
+        if (state.tableData[row][cell] === CODE.NORMAL) {
+          openedCount += 1;
+        }
         Vue.set(state.tableData[row], cell, counted.length);
       }
       checkAround(row, cell);
+      let halted = false;
+      let result = '';
+      if (state.data.row * state.data.cell - state.data.mine === state.openedCount + openedCount) {
+        halted = true;
+        result = `${state.timer}초만에 승리하셨습니다.`;
+      }
+      state.openedCount += openedCount;
+      state.halted = halted;
+      state.result = result;
     },
     [CLICK_MINE](state, { row, cell }) {
       state.halted = true;
