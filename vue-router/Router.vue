@@ -2,7 +2,7 @@
   <div>
     <div>
       <router-link to="/game">게임 매쳐</router-link>
-      <router-link to="/game/number-baseball">숫자야구</router-link>
+      <router-link to="/game/number-baseball?pages=3&offset=10&limit=1&sort=createdAt#abc">숫자야구</router-link>
       <router-link to="/game/response-check">반응속도</router-link>
       <router-link to="/game/rock-scissors-paper">가위바위보</router-link>
       <router-link to="/game/lotto-generator">로또생성기</router-link>
