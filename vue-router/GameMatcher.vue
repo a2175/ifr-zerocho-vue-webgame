@@ -12,9 +12,19 @@
 </template>
 
 <script>
-  import NumberBaseball from '../3.숫자야구/NumberBaseball';
-  import ResponseCheck from '../4.반응속도체크/ResponseCheck';
-  import LottoGenerator from '../6.로또/LottoGenerator';
+  import { defineAsyncComponent } from 'vue';
+
+  const NumberBaseball = defineAsyncComponent(() => 
+    import("../3.숫자야구/NumberBaseball")
+  );
+
+  const ResponseCheck = defineAsyncComponent(() => 
+    import("../4.반응속도체크/ResponseCheck")
+  );
+
+  const LottoGenerator = defineAsyncComponent(() => 
+    import("../5.가위바위보/RockScissorsPaper")
+  );
 
   export default {
     components: {
